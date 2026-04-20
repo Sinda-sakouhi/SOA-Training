@@ -14,7 +14,7 @@ import java.util.List;
 @Path("/modules")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class ModuleResource {
+public class ModuleRessources {
 
     private ModuleBusiness moduleBusiness = new ModuleBusiness();
     private UniteEnseignementBusiness ueBusiness = new UniteEnseignementBusiness();

@@ -1,6 +1,4 @@
-// src/main/java/webservices/ApplicationMain.java
 package webservices;
-
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 import java.util.HashSet;
@@ -11,10 +9,11 @@ public class ApplicationMain extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {
-        Set<Class<?>> classes = new HashSet<>();
-        classes.add(HelloRessources.class);
-        classes.add(UniteEnseignementResource.class);
-        classes.add(ModuleResource.class);
-        return classes;
+        Set<Class<?>> resources = new HashSet<>();
+        resources.add(UERessources.class);
+        resources.add(ModuleRessources.class);
+        resources.add(HelloRessources.class);
+
+        return resources;
     }
 }
