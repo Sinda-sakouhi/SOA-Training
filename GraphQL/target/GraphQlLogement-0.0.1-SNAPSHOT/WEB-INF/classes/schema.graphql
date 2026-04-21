@@ -7,6 +7,8 @@ type UniteEnseignement {
 }
 type QueryResolver {
     allUEs: [UniteEnseignement]
+    getUEByCode (code: Int!) : UniteEnseignement
+
 }
 
 

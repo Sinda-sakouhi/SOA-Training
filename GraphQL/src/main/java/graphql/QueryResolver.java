@@ -1,56 +1,91 @@
 package graphql;
 
-// Import the business logic class responsible for managing "UniteEnseignement" data
+import business.ModuleBusiness;
 import business.UniteEnseignementBusiness;
-
-// Import the GraphQL library class used to define the root of GraphQL queries
 import com.coxautodev.graphql.tools.GraphQLRootResolver;
-
-// Import the entity class that represents a Teaching Unit (Unité d’Enseignement)
+import entities.Module;
 import entities.UniteEnseignement;
 
-import java.util.List;
+public class MutationResolver implements GraphQLRootResolver {
 
-/**
- * This class acts as the root resolver for GraphQL queries.
- * It tells GraphQL how to fetch data when a query is executed.
- *
- * In this example, it handles queries related to "UniteEnseignement".
- */
-public class QueryResolver implements GraphQLRootResolver {
+    private UniteEnseignementBusiness ueBusiness;
+    private ModuleBusiness moduleBusiness;
 
-    // Attribute used to call the business logic layer (service) for data operations
-    public UniteEnseignementBusiness helper;
-
-    /**
-     * Constructor of the resolver.
-     * It initializes the business helper that provides methods to retrieve UE data.
-     */
-    public QueryResolver(){
-        helper = new UniteEnseignementBusiness();
+    public MutationResolver() {
+        this.ueBusiness = new UniteEnseignementBusiness();
+        this.moduleBusiness = new ModuleBusiness();
     }
 
-    /**
-     * GraphQL Query: allUEs
-     *
-     * This method will be automatically exposed to the GraphQL schema as a query named "allUEs".
-     *
-     * When a client sends the GraphQL query:
-     *
-     *    query {
-     *        allUEs {
-     *            code
-     *            domaine
-     *        }
-     *    }
-     *
-     * GraphQL will call this method to return a list of "UniteEnseignement" objects.
-     *
-     * @return List of all Teaching Units (Unité d’Enseignement)
-     */
-    public List<UniteEnseignement> allUEs(){
-        // Delegates the request to the business layer method getListeUE()
-        // which fetches all UE entities (e.g., from a database or a static list)
-        return helper.getListeUE();
+    // ============ MUTATIONS pour UniteEnseignement ============
+
+    // 1. Ajouter une UE
+    public boolean addUniteEnseignement(int code, String domaine, String responsable, int credits, int semestre) {
+        // Vérifier si l'UE existe déjà
+        if (ueBusiness.getUEByCode(code) != null) {
+            return false;
+        }
+        UniteEnseignement ue = new UniteEnseignement(code, domaine, responsable, credits, semestre);
+        return ueBusiness.addUniteEnseignement(ue);
+    }
+
+    // 2. Modifier une UE
+    public boolean updateUniteEnseignement(int code, String domaine, String responsable, int credits, int semestre) {
+        UniteEnseignement existingUE = ueBusiness.getUEByCode(code);
+        if (existingUE == null) {
+            return false;
+        }
+        UniteEnseignement updatedUE = new UniteEnseignement(code, domaine, responsable, credits, semestre);
+        return ueBusiness.updateUniteEnseignement(code, updatedUE);
+    }
+
+    // 3. Supprimer une UE
+    public boolean deleteUniteEnseignement(int code) {
+        return ueBusiness.deleteUniteEnseignement(code);
+    }
+
+    // ============ MUTATIONS pour Module ============
+
+    // 4. Ajouter un module
+    public boolean addModule(String matricule, String nom, int coefficient, int volumeHoraire,
+                             String type, int codeUE) {
+        // Vérifier si le module existe déjà
+        if (moduleBusiness.getModuleByMatricule(matricule) != null) {
+            return false;
+        }
+
+        // Vérifier si l'UE existe
+        UniteEnseignement ue = ueBusiness.getUEByCode(codeUE);
+        if (ue == null) {
+            return false;
+        }
+
+        Module.TypeModule moduleType = Module.TypeModule.valueOf(type);
+        Module module = new Module(matricule, nom, coefficient, volumeHoraire, moduleType, ue);
+        return moduleBusiness.addModule(module);
+    }
+
+    // 5. Modifier un module
+    public boolean updateModule(String matricule, String nom, int coefficient, int volumeHoraire,
+                                String type, int codeUE) {
+        // Vérifier si le module existe
+        Module existingModule = moduleBusiness.getModuleByMatricule(matricule);
+        if (existingModule == null) {
+            return false;
+        }
+
+        // Vérifier si l'UE existe
+        UniteEnseignement ue = ueBusiness.getUEByCode(codeUE);
+        if (ue == null) {
+            return false;
+        }
+
+        Module.TypeModule moduleType = Module.TypeModule.valueOf(type);
+        Module updatedModule = new Module(matricule, nom, coefficient, volumeHoraire, moduleType, ue);
+        return moduleBusiness.updateModule(matricule, updatedModule);
+    }
+
+    // 6. Supprimer un module
+    public boolean deleteModule(String matricule) {
+        return moduleBusiness.deleteModule(matricule);
     }
 }

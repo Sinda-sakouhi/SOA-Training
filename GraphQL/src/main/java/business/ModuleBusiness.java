@@ -92,4 +92,17 @@ private UniteEnseignementBusiness uniteEnseignementBusiness=new UniteEnseignemen
         }
         return result;
     }
+    // Ajouter dans ModuleBusiness.java
+
+    // Récupérer les modules par code UE (sans avoir besoin de l'objet UE complet)
+    public List<Module> getModulesByCodeUE(int codeUE) {
+        List<Module> result = new ArrayList<>();
+        for (Module m : modules) {
+            if (m.getUniteEnseignement() != null &&
+                    m.getUniteEnseignement().getCode() == codeUE) {
+                result.add(m);
+            }
+        }
+        return result;
+    }
 }

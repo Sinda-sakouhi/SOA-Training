@@ -1,16 +1,51 @@
+# ============ DÉFINITION DES TYPES ============
+
+# Type pour UniteEnseignement
 type UniteEnseignement {
-    code: Int
-    domaine: String
-    responsable: String
-    credits: Int
-    semestre: Int
+    code: Int!
+    domaine: String!
+    responsable: String!
+    credits: Int!
+    semestre: Int!
 }
-type QueryResolver {
+
+# Type pour Module
+type Module {
+    matricule: String!
+    nom: String!
+    coefficient: Int!
+    volumeHoraire: Int!
+    type: TypeModule!
+    uniteEnseignement: UniteEnseignement
+}
+
+# Enumération pour TypeModule
+enum TypeModule {
+    TRANSVERSAL
+    PROFESSIONNEL
+    RECHERCHE
+}
+
+# ============ QUERIES (LECTURE) ============
+
+type Query {
+    # Queries pour UniteEnseignement
     allUEs: [UniteEnseignement]
+    ueByCode(code: Int!): UniteEnseignement
+    ueByDomaine(domaine: String!): [UniteEnseignement]
+    ueBySemestre(semestre: Int!): [UniteEnseignement]
+
+    # Queries pour Module
+    allModules: [Module]
+    moduleByMatricule(matricule: String!): Module
+    modulesByType(type: TypeModule!): [Module]
+    modulesByCodeUE(codeUE: Int!): [Module]
 }
 
+# ============ MUTATIONS (ÉCRITURE) ============
 
-type MutationResolver {
+type Mutation {
+    # Mutations pour UniteEnseignement
     addUniteEnseignement(
         code: Int!
         domaine: String!
@@ -19,8 +54,41 @@ type MutationResolver {
         semestre: Int!
     ): Boolean
 
+    updateUniteEnseignement(
+        code: Int!
+        domaine: String!
+        responsable: String!
+        credits: Int!
+        semestre: Int!
+    ): Boolean
+
+    deleteUniteEnseignement(code: Int!): Boolean
+
+    # Mutations pour Module
+    addModule(
+        matricule: String!
+        nom: String!
+        coefficient: Int!
+        volumeHoraire: Int!
+        type: TypeModule!
+        codeUE: Int!
+    ): Boolean
+
+    updateModule(
+        matricule: String!
+        nom: String!
+        coefficient: Int!
+        volumeHoraire: Int!
+        type: TypeModule!
+        codeUE: Int!
+    ): Boolean
+
+    deleteModule(matricule: String!): Boolean
 }
+
+# ============ SCHEMA ROOT ============
+
 schema {
-    query: QueryResolver
-    mutation: MutationResolver
+    query: Query
+    mutation: Mutation
 }
